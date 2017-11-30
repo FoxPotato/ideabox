@@ -1,1 +1,0 @@
-@"d:\users\foxpotato\documents\ideabox\venv\scripts\python.exe" "d:\users\foxpotato\documents\ideabox\venv\Scripts\markdown_py" %*
