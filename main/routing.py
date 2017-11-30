@@ -1,5 +1,7 @@
-from channels.routing import route
+from channels import route, route_class
+
+from main import consumers
 
 channel_routing = [
-    route("http.request", "myapp.consumers.http_consumer"),
+    route_class(consumers.WSConsumer, path=r"^/$"),
 ]
