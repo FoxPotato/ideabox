@@ -151,39 +151,49 @@ function getTouchPos(e) {
 // Set-up the canvas and add our event handlers after the page has loaded
 function init() {
     // Get the specific canvas element from the HTML document
-    canvas = document.getElementById('sketchpad');
-    console.log(canvas);
-    // If the browser supports the canvas tag, get the 2d drawing context for this canvas
-    if (canvas.getContext)
-        ctx = canvas.getContext('2d');
 
-    // Check that we have a valid context to draw on/with before adding event handlers
-    if (ctx) {
-        // React to mouse events on the canvas, and mouseup on the entire document
-        canvas.addEventListener('mousedown', sketchpad_mouseDown, false);
-        canvas.addEventListener('mousemove', sketchpad_mouseMove, false);
-        window.addEventListener('mouseup', sketchpad_mouseUp, false);
-
-        // React to touch events on the canvas
-        canvas.addEventListener('touchstart', sketchpad_touchStart, false);
-        canvas.addEventListener('touchend', sketchpad_touchEnd, false);
-        canvas.addEventListener('touchmove', sketchpad_touchMove, false);
-    }
 }
 
 Vue.component('id-canvas', {
         data: function () {
-            return {lorem: "canvas"}
+            return {lorem: "canvas", canvas: this.$refs.canvas}
+        },
+        updated() {
+
         },
         mounted() {
-            init();
+            canvas = this.$refs.canvas;
+            parent = this.$refs.cparent;
+            console.log(parent.offsetHeight, parent.offsetWidth)
+            canvas.style.width = `${parent.offsetWidth}px`;
+            canvas.style.height = `${parent.offsetHeight}px`;
+            // ...then set the internal size to match
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            console.log(canvas.offsetHeight)
+            // If the browser supports the canvas tag, get the 2d drawing context for this canvas
+            if (canvas.getContext)
+                ctx = canvas.getContext('2d');
+
+            // Check that we have a valid context to draw on/with before adding event handlers
+            if (ctx) {
+                // React to mouse events on the canvas, and mouseup on the entire document
+                canvas.addEventListener('mousedown', sketchpad_mouseDown, false);
+                canvas.addEventListener('mousemove', sketchpad_mouseMove, false);
+                window.addEventListener('mouseup', sketchpad_mouseUp, false);
+
+                // React to touch events on the canvas
+                canvas.addEventListener('touchstart', sketchpad_touchStart, false);
+                canvas.addEventListener('touchend', sketchpad_touchEnd, false);
+                canvas.addEventListener('touchmove', sketchpad_touchMove, false);
+            }
         },
         template: `
-    <div onload="init()" id="sketchpadapp">
-        <input type="submit" value="Clear Sketchpad" id="clearbutton" onclick="clearCanvas(canvas,ctx);">
-            <canvas id="sketchpad" height="300" width="400"></canvas>
-        </div>
-    </div>`
+        <v-flex d-flex id="sketchpadapp">
+            <input type="submit" value="Clear Sketchpad" id="clearbutton" onclick="clearCanvas(canvas,ctx);">
+            <!--<md-color-picker value="#000000"></md-color-picker>-->
+            <div ref="cparent" id="cparent"><canvas ref="canvas" id="sketchpad"></canvas></div>
+        </v-flex>`
     }
 );
 
