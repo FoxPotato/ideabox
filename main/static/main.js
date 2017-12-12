@@ -190,9 +190,22 @@ Vue.component('id-canvas', {
         },
         template: `
         <v-flex d-flex id="sketchpadapp">
-            <input type="submit" value="Clear Sketchpad" id="clearbutton" onclick="clearCanvas(canvas,ctx);">
-            <!--<md-color-picker value="#000000"></md-color-picker>-->
-            <div ref="cparent" id="cparent"><canvas ref="canvas" id="sketchpad"></canvas></div>
+            <v-layout row wrap>
+                <v-flex lg2>
+                    <input type="submit" value="Clear Sketchpad" id="clearbutton" onclick="clearCanvas(canvas,ctx);">
+                </v-flex>
+                <v-flex lg22>
+                    <md-color-picker colors-per-row="10" use-spectrum-picker="false" value="#000000"></md-color-picker>
+                </v-flex>
+            </v-layout>
+            <v-layout row wrap>
+                <v-flex lg1>
+                    <span>pen</span>
+                </v-flex>
+                <v-flex lg11>
+                    <div ref="cparent" id="cparent"><canvas ref="canvas" id="sketchpad"></canvas></div>
+                </v-flex>
+            </v-layout>
         </v-flex>`
     }
 );
