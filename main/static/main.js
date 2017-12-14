@@ -158,68 +158,31 @@ Vue.component('id-canvas', {
         data: function () {
             return {lorem: "canvas", canvas: this.$refs.canvas}
         },
-        updated() {
-
-        },
-        mounted() {
-            canvas = this.$refs.canvas;
-            parent = this.$refs.cparent;
-            console.log(parent.offsetHeight, parent.offsetWidth)
-            canvas.style.width = `${parent.offsetWidth}px`;
-            canvas.style.height = `${parent.offsetHeight}px`;
-            // ...then set the internal size to match
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
-            console.log(canvas.offsetHeight)
-            // If the browser supports the canvas tag, get the 2d drawing context for this canvas
-            if (canvas.getContext)
-                ctx = canvas.getContext('2d');
-
-            // Check that we have a valid context to draw on/with before adding event handlers
-            if (ctx) {
-                // React to mouse events on the canvas, and mouseup on the entire document
-                canvas.addEventListener('mousedown', sketchpad_mouseDown, false);
-                canvas.addEventListener('mousemove', sketchpad_mouseMove, false);
-                window.addEventListener('mouseup', sketchpad_mouseUp, false);
-
-                // React to touch events on the canvas
-                canvas.addEventListener('touchstart', sketchpad_touchStart, false);
-                canvas.addEventListener('touchend', sketchpad_touchEnd, false);
-                canvas.addEventListener('touchmove', sketchpad_touchMove, false);
-            }
-        },
         template: `
-        <v-flex d-flex id="sketchpadapp">
-            <v-layout row wrap>
-                <v-flex lg2>
-                    <input type="submit" value="Clear Sketchpad" id="clearbutton" onclick="clearCanvas(canvas,ctx);">
-                </v-flex>
-                <v-flex lg22>
-                    <md-color-picker colors-per-row="10" use-spectrum-picker="false" value="#000000"></md-color-picker>
-                </v-flex>
-            </v-layout>
-            <v-layout row wrap>
-                <v-flex lg1>
-                    <span>pen</span>
-                </v-flex>
-                <v-flex lg11>
-                    <div ref="cparent" id="cparent"><canvas ref="canvas" id="sketchpad"></canvas></div>
-                </v-flex>
-            </v-layout>
-        </v-flex>`
+            <v-card color="grey">
+            <v-card-title primary class="title" primary-title>Teken hier</v-card-title>
+                    <v-card-text v-text="lorem">
+                    </v-card-text>
+            </v-card>
+        `
     }
 );
 
 Vue.component('id-info', {
         data: function () {
-            return {lorem: "info"}
+            return {item: "idee"}
         },
         template: `
             <v-card color="purple" dark>
-                <v-card-title primary class="title">Lorem</v-card-title>
-                <v-card-text
-                        v-text="lorem">
-                </v-card-text>
+                <v-card-title primary class="title" primary-title>Campus ideeen</v-card-title>
+                    <v-expansion-panel popout>
+                         <v-expansion-panel-content v-for="(item,i) in 5" :key="i">
+                            <div slot="header">hello</div>
+                            <v-card>
+                              <v-card-text class="grey lighten-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</v-card-text>
+                            </v-card>
+                         </v-expansion-panel-content> 
+                    </v-expansion-panel>
             </v-card>`
 
     }
@@ -230,10 +193,10 @@ Vue.component('id-form', {
             return {lorem: "form"}
         },
         template: `
+        
             <v-card color="purple" dark>
-                <v-card-title primary class="title">Lorem</v-card-title>
-                <v-card-text
-                        v-text="lorem">
+                <v-card-title primary class="title" primary-title>Zebra gesloten?</v-card-title>
+                <v-card-text v-text="lorem">
                 </v-card-text>
             </v-card>`
     }

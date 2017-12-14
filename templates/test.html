@@ -11,6 +11,11 @@
             height:100%;
         }
 
+        h2 {
+            padding: 0;
+            margin: 0;
+        }
+
         #left, #right {
             width: 50%;
             height:100%;
@@ -55,10 +60,22 @@
             box-shadow: inset 0 0 0 1px #999;
             height: 33%;
         }
+        
+        #ideaboxleft {
+            float: left;
+        }
+        #ideaboxright {
+            float: left;
+            margin-left: 100px;
+        }
+
+        #ideaboxright li {
+            list-style: none;
+        }
 
         #postidea {
             height: 33%;
-            box-shadow: inset 0 0 0 1px #;
+            box-shadow: inset 0 0 0 1px #999;
         }
 
         #appointment {
@@ -83,17 +100,32 @@
 
 <div id="right">
     <div id="ideaboxtitle">
-
+        <h2>Campus ideeen</h2>
     </div>
     <div id="ideabox">
-
+        <div id="ideaboxleft">
+            <ul>
+                <li>Idee</li>
+                <li>Idee</li>
+                <li>Idee</li>
+            </ul>
+        </div>
+        <div id="ideaboxright">
+            <ul>
+                <li>XXX</li>
+                <li>XX</li>
+                <li>X</li>
+            </ul>
+        </div>
     </div>
     <div id="postidea">
-
+        <input type="submit" value="Post idea" id="postbutton">
     </div>
     <div id="appointment">
-
+        <h2>ZEBRA gesloten?</h2>
+        <input type="submit" value="Klik hier!" id="appointmentbutton">
     </div>
 </div>
 </body>
 </html>
+

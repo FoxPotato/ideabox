@@ -11,7 +11,7 @@ from main.serializers import IdeaSerializer
 
 class Index(View):
     def get(self, request, *args, **kwargs):
-        return render(request, 'test.html')
+        return render(request, 'index.html')
 
 
 class IdeaViewSet(mixins.CreateModelMixin,
