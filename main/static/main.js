@@ -159,7 +159,7 @@ Vue.component('id-canvas', {
             return {lorem: "canvas", canvas: this.$refs.canvas}
         },
         template: `
-            <v-card color="grey">
+            <v-card color="green">
             <v-card-title primary class="title" primary-title>Teken hier</v-card-title>
                     <v-card-text v-text="lorem">
                     </v-card-text>
@@ -173,8 +173,9 @@ Vue.component('id-info', {
             return {item: "idee"}
         },
         template: `
-            <v-card color="purple" dark>
-                <v-card-title primary class="title" primary-title>Campus ideeen</v-card-title>
+            <v-card color="green">
+                <v-card-title primary class="title">Campus ideeen</v-card-title>
+                <v-container>
                     <v-expansion-panel popout>
                          <v-expansion-panel-content v-for="(item,i) in 5" :key="i">
                             <div slot="header">hello</div>
@@ -183,6 +184,24 @@ Vue.component('id-info', {
                             </v-card>
                          </v-expansion-panel-content> 
                     </v-expansion-panel>
+                </v-container>
+                <v-card-title primary class="title">Deel jouw idee!</v-card-title>
+                <v-container>
+                    <v-layout row wrap>
+                      <v-flex xs12 sm4>
+                        <p>Overflow</p>
+                        <v-select v-bind:items="dropdown_font" overflow label="Select"></v-select>
+                      </v-flex>
+                      <v-flex xs12 sm4>
+                        <p>Segmented</p>
+                        <v-select v-bind:items="dropdown_icon" label="Select" segmented></v-select>
+                      </v-flex>
+                      <v-flex xs12 sm4>
+                        <p>Editable</p>
+                        <v-select v-bind:items="dropdown_edit" label="Select" editable item-value="text"></v-select>
+                      </v-flex>
+                    </v-layout>
+                </v-container>
             </v-card>`
 
     }
@@ -194,10 +213,33 @@ Vue.component('id-form', {
         },
         template: `
         
-            <v-card color="purple" dark>
+            <v-card color="green">
                 <v-card-title primary class="title" primary-title>Zebra gesloten?</v-card-title>
-                <v-card-text v-text="lorem">
-                </v-card-text>
+                <v-container>
+                    <v-expansion-panel popout>
+                         <v-expansion-panel-content v-for="(item,i) in 1" :key="i">
+                            <div slot="header">Maak een afspraak!</div>
+                            <v-card>
+                            <v-container>
+                                <v-layout row wrap>
+                                    <v-flex xs12 sm4>
+                                        <p>Overflow</p>
+                                        <v-select v-bind:items="dropdown_font" overflow label="Select"></v-select>
+                                    </v-flex>
+                                    <v-flex xs12 sm4>
+                                        <p>Segmented</p>
+                                        <v-select v-bind:items="dropdown_icon" label="Select" segmented></v-select>
+                                    </v-flex>
+                                    <v-flex xs12 sm4>
+                                        <p>Editable</p>
+                                        <v-select v-bind:items="dropdown_edit" label="Select" editable item-value="text"></v-select>
+                                    </v-flex>
+                                </v-layout>
+                            </v-container>
+                            </v-card>
+                         </v-expansion-panel-content> 
+                    </v-expansion-panel>
+                </v-container>
             </v-card>`
     }
 );
