@@ -1,4 +1,24 @@
 /* Some CSS styling */
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    overflow-y: hidden;
+}
+.application.theme--light {
+}
+
+
+.full-height {
+    height: 100% !important;
+}
+
+.full-height.layout {
+   height: 100%  !important;
+}
+
 #sketchpadapp {
     /* Prevent nearby text being highlighted when accidentally dragging mouse outside confines of the canvas */
     -webkit-touch-callout: none;
