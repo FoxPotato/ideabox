@@ -1,53 +1,12 @@
 /* Some CSS styling */
 
-* {
-    box-sizing: border-box;
-}
-
 html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
     overflow-y: hidden;
 }
-.application.theme--light {
-}
-
 
 .full-height {
-    height: 100% !important;
-}
-
-.full-height.layout {
-   height: 100%  !important;
-}
-
-#sketchpadapp {
-    /* Prevent nearby text being highlighted when accidentally dragging mouse outside confines of the canvas */
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
-#sketchpadapp.d-flex > * {
-    -webkit-box-flex: 1;
-    -ms-flex: 1 1;
-    flex: 1 1;}
-
-#cparent {
-}
-
-#sketchpad {
-    /*position: relative;*/
-    border: 2px solid #888;
-    border-radius: 4px;
-}
-
-#clearbutton {
-    font-size: 15px;
-    padding: 10px;
-    -webkit-appearance: none;
-    background: #eee;
-    border: 1px solid #888;
-    width: 20px;
+    height: 100%;
 }
