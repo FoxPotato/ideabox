@@ -19,10 +19,11 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from rest_framework import routers
 
-from main.views import Index, IdeaViewSet
+from main.views import Index, IdeaViewSet, AppointmentViewSet
 
 router = routers.DefaultRouter()
 router.register(r'ideas', IdeaViewSet)
+router.register(r'appointments', AppointmentViewSet)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),

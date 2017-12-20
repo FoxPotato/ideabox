@@ -15,13 +15,43 @@ Vue.component('id-canvas', {
     }
 );
 
-Vue.component('id-info', {
+Vue.component('id-ideas', {
         data: function () {
             return {
-                item: "idee",
                 dialog: false,
+                sectorItems: [
+                    'Autotechniek',
+                    'Bouw',
+                    'CIOS',
+                    'Dans en Theater',
+                    'Entree',
+                    'Handel en Commercie',
+                    'Horeca en Facility',
+                    'ICT',
+                    'Lab',
+                    'Logistiek',
+                    'Maritiem',
+                    'Marketing en Media',
+                    'MyTec',
+                    'Orde en Veiligheid',
+                    'Recreatie',
+                    'Techniek',
+                    'Uiterlijke Verzorging',
+                    'Welzijn',
+                    'Zakelijk',
+                    'Zorg'
+                ],
+                items: [
+                ],
                 validForm: false,
                 formInput: {student_number: "", sector: "", title: "", message: ""}
+            }
+        },
+        methods: {
+            submit () {
+                this.$http.post('api/ideas/', this.formInput).then((response) => {
+                    this.dialog = false;
+                });
             }
         },
         template: `
@@ -33,10 +63,10 @@ Vue.component('id-info', {
                 </v-toolbar>
                 <v-container>
                     <v-expansion-panel popout>
-                         <v-expansion-panel-content v-for="(item,i) in 10" :key="i">
-                            <div slot="header">hello</div>
+                         <v-expansion-panel-content v-for="(item, i) in items" :key="i">
+                            <div slot="header">{{item.title}}</div>
                             <v-card>
-                              <v-card-text class="grey lighten-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</v-card-text>
+                              <v-card-text class="grey lighten-3">{{item.message}}</v-card-text>
                             </v-card>
                          </v-expansion-panel-content> 
                     </v-expansion-panel>
@@ -55,17 +85,17 @@ Vue.component('id-info', {
                                 <v-container grid-list-md>
                                     <v-layout row wrap>
                                         <v-flex xs6>
-                                            <v-text-field v-model="formInput.student_number" label="student number" required :rules="[v=>!!v || 'this field is required']"></v-text-field>
+                                            <v-text-field v-model="formInput.student_number" label="Stamnummer/gebruikersnaam" required :rules="[v=>!!v || 'this field is required']"></v-text-field>
                                         </v-flex>
                                         <v-flex xs6>
-                                            <v-select v-model="formInput.sector" label="sector" autocomplete required :items="['Techniek', 'Economie', 'Zorg']" :rules="[v=>!!v || 'this field is required']"></v-select>
+                                            <v-select v-model="formInput.sector" label="Sector" autocomplete required :items="sectorItems" :rules="[v=>!!v || 'this field is required']"></v-select>
                                         </v-flex>
                                     </v-layout>
                                     <v-flex xs12>
-                                        <v-text-field v-model="formInput.title" label="title" required :rules="[v=>!!v || 'this field is required']"></v-text-field>
+                                        <v-text-field v-model="formInput.title" label="Titel" required :rules="[v=>!!v || 'this field is required']"></v-text-field>
                                     </v-flex>
                                     <v-flex xs12>
-                                        <v-text-field v-model="formInput.message" name="input-7-1" label="message" multi-line required :rules="[v=>!!v || 'this field is required']"></v-text-field>
+                                        <v-text-field v-model="formInput.message" name="input-7-1" label="Bericht" multi-line required :rules="[v=>!!v || 'this field is required']"></v-text-field>
                                     </v-flex>
                                     <v-btn @click="submit" :disabled="!validForm">Submit</v-btn>
                                 </v-container>
@@ -73,18 +103,30 @@ Vue.component('id-info', {
                         </v-card-text>
                     </v-card>
                 </v-dialog>
-            </v-card>`
+            </v-card>`,
+        created() {
+            this.$http.get('/api/ideas/').then((response) => {
+                this.items = response.body;
+            })
+        }
 
     }
 );
 
-Vue.component('id-form', {
+Vue.component('id-appointment', {
         data: function () {
             return {
                 lorem: "form",
                 dialog: false,
                 validForm: false,
-                formInput: {pid: "", date: "", time: "", message: ""}
+                formInput: {student_number: "", date: "", time: "", message: ""}
+            }
+        },
+        methods: {
+            submit() {
+                this.$http.post('api/appointments/', this.formInput).then((response) => {
+                    this.dialog = false;
+                });
             }
         },
         template: `
@@ -112,9 +154,9 @@ Vue.component('id-form', {
                                     <v-layout row wrap>
                                         <v-flex d-flex>
                                             <v-flex xs8 offset-xs2>
-                                                <v-text-field v-model="formInput.pid" label="Stamnummer/gebruikersnaam" required :rules="[v=>!!v || 'this field is required']"></v-text-field>
-                                                <v-text-field v-model="formInput.message" name="input-7-1" label="message" multi-line required :rules="[v=>!!v || 'this field is required']"></v-text-field>
-                                            
+                                                <v-text-field v-model="formInput.student_number" label="Stamnummer/gebruikersnaam" required :rules="[v=>!!v || 'this field is required']"></v-text-field>
+                                                <v-text-field v-model="formInput.message" name="input-7-1" label="Bericht" multi-line required :rules="[v=>!!v || 'this field is required']"></v-text-field>
+                                                
                                                 <v-flex xs12 d-flex>
                                                     <v-date-picker v-model="formInput.date" color="teal" ></v-date-picker>
                                                     <v-spacer></v-spacer>

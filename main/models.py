@@ -31,4 +31,10 @@ class IdeaModel(models.Model):
 
     title = models.CharField(max_length=256)
     message = models.TextField()
-    signature = models.ImageField()
+
+
+class AppointmentModel(models.Model):
+    student_number = models.CharField(max_length=256)
+    message = models.TextField()
+    date = models.DateField()
+    time = models.TimeField()
