@@ -32,3 +32,4 @@ class AppointmentViewSet(mixins.CreateModelMixin,
                   GenericViewSet):
     queryset = AppointmentModel.objects.all()
     serializer_class = AppointmentSerializer
+

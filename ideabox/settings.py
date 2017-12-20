@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'main.apps.MainConfig',
     'channels',
     'rest_framework',
+    'solo.apps.SoloAppConfig',
 ]
 
 MIDDLEWARE = [
