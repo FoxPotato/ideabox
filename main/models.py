@@ -1,5 +1,4 @@
 from django.db import models
-from solo.models import SingletonModel
 
 SECTORS = (
     ('Autotechniek', 'Autotechniek'),
@@ -39,7 +38,3 @@ class AppointmentModel(models.Model):
     message = models.TextField()
     date = models.DateField()
     time = models.TimeField()
-
-
-class MessageModel(SingletonModel):
-    message = models.TextField()
