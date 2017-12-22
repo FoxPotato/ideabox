@@ -4,51 +4,42 @@
 <head>
     <meta charset="UTF-8">
     <title>Nova Ideeenbus</title>
-
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
+    <!-- import reset material icons, fonts and vue-mdc-adapter stylesheets -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" type="text/css">
     <link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
     <link href="{% static "css/style.css" %}" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
 </head>
 <body>
-<v-app id="app">
-    <v-container fluid grid-list-md>
-        <v-layout column class="full-height">
-            <v-layout row wrap>
-                <v-flex d-flex>
-                    <v-flex d-flex xs6>
-                        <id-canvas></id-canvas>
-                    </v-flex>
 
-                    <v-flex d-flex xs6>
-                        <v-layout column>
-                            <v-flex d-flex xs12>
-                                <id-ideas></id-ideas>
-                            </v-flex>
-                            <v-flex d-flex xs12>
-                                <id-appointment></id-appointment>
-                            </v-flex>
-                        </v-layout>
-                    </v-flex>
-                </v-flex>
-            </v-layout>
-        </v-layout>
-    </v-container>
-</v-app>
+<div id="app" class="container">
+    <div class="item item1">
+        <id-canvas></id-canvas>
+    </div>
+    <div class="item item2">
+        <id-ideas></id-ideas>
+    </div>
+    <div class="item item3">
+        <id-appointment></id-appointment>
+    </div>
+</div>
 
 </body>
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
-<script src="https://unpkg.com/vue/dist/vue.js"></script>
-<script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
+<!-- import vue and then vue-mdc-adapter -->
+<script src="https://unpkg.com/vue"></script>
+<script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.3.4"></script>
 <script src="{% static "channels/js/websocketbridge.js" %}"></script>
 <script src="{% static "main.js" %}"></script>
 <script src="{% static "md-color-picker.js" %}"></script>
 <script>
-    Vue.http.interceptors.push(function(request, next) {
-      request.headers.set('X-CSRFToken', Cookies.get('csrftoken'));
-      next();
+    Vue.http.interceptors.push(function (request, next) {
+        request.headers.set('X-CSRFToken', Cookies.get('csrftoken'));
+        next();
     });
 </script>
 </html>
