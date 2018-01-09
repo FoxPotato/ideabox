@@ -20,7 +20,7 @@ Vue.component('id-ideas', {
         data: function () {
             return {
                 dialog: false,
-                sectorItems: [
+                sectorList: [
                     'Autotechniek',
                     'Bouw',
                     'CIOS',
@@ -62,76 +62,53 @@ Vue.component('id-ideas', {
                            <span class="mdc-toolbar__title">Title</span>
                        </section>
                        <section class="mdc-toolbar__section mdc-toolbar__section--align-end">
-                           <button class="mdc-button mdc-button--unelevated secondary-filled-button">
-                               Raised disabled button
-                           </button>
+                           <span class="mdc-toolbar__title"><button class="mdc-button mdc-button--unelevated secondary-filled-button">
+                               Deel jouw idee!
+                           </button></span>
                        </section>
                    </div>
                </header>
-               <mdc-list bordered two-line>
-                    <a v-for="(item, i) in items" v-if="i < 7" href="" :key="i" class="mdc-ripple-surface mdc-list-item">         
+               <ul class="mdc-list">
+                    <a v-for="(item, i) in items" v-if="i < 7" href="" :key="i" class="mdc-ripple-surface mdc-list-item">
                         <span class="mdc-list-item__text">
                             {{item.title}}
                             <span class="mdc-list-item__text__secondary">{{item.message}}</span>
                         </span>
                     </a>
-                </mdc-list>
+                </ul>
+                <aside class="mdc-dialog" role="alertdialog" aria-labelledby="dialog-title" aria-describedby="dialog-description">
+                    <div class="mdc-dialog__surface">
+                        <header class="mdc-dialog__header">
+                            <h2 class="mdc-dialog__header__title">Deel jouw idee!</h2>
+                        </header>
+                    </div>
+                    
+                    <form>
+                        <div class="mdc-text-field">
+                            <input type="text" class="mdc-text-field__input">
+                            <label class="mdc-text-field__label">Stamnummer/gebruikersnaam</label> 
+                        </div>
+                        <div class="mdc-select" role="listbox" tabindex="0">
+                            <span class="mdc-select__selected-text">Sector</span>
+                            <div class="mdc-simple-menu mdc-select__menu">
+                                <ul class="mdc-list mdc-simple-menu__items">
+                                    <li v-for="sector in sectorList">{{sector}}</li>   
+                                </ul>                                     
+                            </div> 
+                        </div>
+                        <div class="mdc-text-field">
+                            <input type="text" class="mdc-text-field__input">
+                            <label class="mdc-text-field__label">Titel</label>
+                        </div>
+                        <div class="mdc-text-field">
+                            <input type="text" class="mdc-text-field__input">
+                            <label class="mdc-text-field__label">Bericht</label>
+                        </div>
+                        <button class="mdc-button">Submit</button> 
+                    </form>   
+                </aside>
             </div>
-            <!--<div class="mdc-card">-->
-                <!--<header class="mdc-toolbar">-->
-                  <!--<div class="mdc-toolbar__row">-->
-                    <!--<section class="mdc-toolbar__section mdc-toolbar__section&#45;&#45;align-start">-->
-                      <!--Section aligns to start.-->
-                    <!--</section>-->
-                    <!--<section class="mdc-toolbar__section">-->
-                      <!--Section aligns to center.-->
-                    <!--</section>-->
-                    <!--<section class="mdc-toolbar__section mdc-toolbar__section&#45;&#45;align-end">-->
-                      <!--Section aligns to end.-->
-                    <!--</section>-->
-                  <!--</div>-->
-                <!--</header>-->
-                <!--<mdc-list bordered two-line>-->
-                    <!--<a v-for="(item, i) in items" v-if="i < 7" href="" :key="i" class="mdc-ripple-surface mdc-list-item">         -->
-                        <!--<span class="mdc-list-item__text">-->
-                            <!--{{item.title}}-->
-                            <!--<span class="mdc-list-item__text__secondary">{{item.message}}</span>-->
-                        <!--</span>-->
-                    <!--</a>-->
-                <!--</mdc-list>-->
-                <!--<mdc-dialog ref="dialog" :overlay="false">-->
-                    <!--<v-card>-->
-                        <!--<v-toolbar dark color="teal">-->
-                            <!--<v-btn icon @click.native="dialog = false" dark>-->
-                                <!--<v-icon>close</v-icon>-->
-                            <!--</v-btn>-->
-                            <!--<v-toolbar-title>Deel jouw idee!</v-toolbar-title>-->
-                            <!--<v-spacer></v-spacer>                               -->
-                        <!--</v-toolbar>-->
-                        <!--<v-card-text>-->
-                            <!--<v-form v-model="validForm" lazy-validation>-->
-                                <!--<v-container grid-list-md>-->
-                                    <!--<v-layout row wrap>-->
-                                        <!--<v-flex xs6>-->
-                                            <!--<v-text-field @focus="focusInput($event, 'student_number')" type="text" data-layout="normal"  v-model="formInput.student_number" label="Stamnummer/gebruikersnaam" required :rules="[v=>!!v || 'this field is required']"></v-text-field>-->
-                                        <!--</v-flex>-->
-                                        <!--<v-flex xs6>-->
-                                            <!--<v-select @focus="focusInput($event, 'sector')" type="text" data-layout="normal"  v-model="formInput.sector" label="Sector" autocomplete required :items="sectorItems" :rules="[v=>!!v || 'this field is required']"></v-select>-->
-                                        <!--</v-flex>-->
-                                    <!--</v-layout>-->
-                                    <!--<v-flex xs12>-->
-                                        <!--<v-text-field @focus="focusInput($event, 'title')" type="text" data-layout="normal"  v-model="formInput.title" label="Titel" required :rules="[v=>!!v || 'this field is required']"></v-text-field>-->
-                                    <!--</v-flex>-->
-                                    <!--<v-flex xs12>-->
-                                        <!--<v-text-field @focus="focusInput($event, 'message')" type="text" data-layout="normal"  v-model="formInput.message" name="input-7-1" label="Bericht" multi-line required :rules="[v=>!!v || 'this field is required']"></v-text-field>-->
-                                    <!--</v-flex>-->
-                                    <!--<v-btn @click="submit" :disabled="!validForm">Submit</v-btn>-->
-                                <!--</v-container>-->
-                            <!--</v-form>-->
-                        <!--</v-card-text>-->
-                    <!--</v-card>-->
-                <!--</mdc-dialog>-->
-            <!--</div>-->`,
+            `,
         created() {
             this.$http.get('/api/ideas/').then((response) => {
                 this.items = response.body;

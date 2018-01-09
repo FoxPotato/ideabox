@@ -36,6 +36,7 @@
 <script src="{% static "channels/js/websocketbridge.js" %}"></script>
 <script src="{% static "main.js" %}"></script>
 <script src="{% static "md-color-picker.js" %}"></script>
+<script>window.mdc.autoInit();</script>
 <script>
     Vue.http.interceptors.push(function (request, next) {
         request.headers.set('X-CSRFToken', Cookies.get('csrftoken'));
