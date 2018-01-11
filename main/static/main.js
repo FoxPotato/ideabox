@@ -1,16 +1,401 @@
+
+    function weekdays(momentLocale, mondayFirst = false) {
+        const weekdays = moment.localeData(momentLocale).weekdaysMin()
+        if (mondayFirst) {
+            return weekdays.slice(1).concat(weekdays[0])
+        }
+        return weekdays
+    }
+
+    function monthDays(month, year, mondayFirst = false) {
+        const monthDate = moment([year, month, 1])
+        let firstDay = monthDate.day() - (mondayFirst ? 1 : 0)
+
+        if (firstDay === -1) {
+            firstDay = 6
+        }
+
+        let days = (new Array(monthDate.daysInMonth() + firstDay)).fill(null)
+
+        return days.map((value, index) => {
+            return index + 1 < firstDay ? null : index + 1 - firstDay
+        })
+    }
+
+    function years() {
+        const currentYear = moment().year()
+        let years = []
+
+        for (let i = currentYear - 100; i < currentYear + 100; i++) {
+            years.push(i)
+        }
+
+        return years
+    }
+
+    function hours() {
+        let hours = []
+
+        for (let i = 0; i < 24; i++) {
+            hours.push(i < 10 ? '0' + i : i)
+        }
+
+        return hours
+    }
+
+    function minutes() {
+        let minutes = []
+
+        for (let i = 0; i < 60; i++) {
+            minutes.push(i < 10 ? '0' + i : i)
+        }
+
+        return minutes
+    }
+
+Vue.component('datepicker', {
+        props: {
+            value: {
+                type: String,
+                required: true
+            },
+            inputFormat: {
+                type: String,
+                default: ''
+            },
+            wrapperClass: {
+                type: String
+            },
+            inputClass: {
+                type: String
+            },
+            placeholder: {
+                type: String
+            },
+            momentLocale: {
+                type: String,
+                default: null
+            },
+            minDate: {
+                type: String,
+                default: null
+            },
+            maxDate: {
+                type: String,
+                default: null
+            },
+            disabledDates: {
+                type: Array,
+                default() {
+                    return []
+                }
+            },
+            mondayFirst: {
+                type: Boolean,
+                default: false,
+            },
+            autoContinue: {
+                type: Boolean,
+                default: false
+            },
+            autoClose: {
+                type: Boolean,
+                default: false
+            },
+            required: {
+                type: Boolean,
+                default: false
+            },
+            i18n: {
+                type: Object,
+                default() {
+                    return {
+                        ok: 'Ok',
+                        cancel: 'Cancel'
+                    }
+                }
+            }
+        },
+        data() {
+            let date = this.getDate()
+            return {
+                isOpen: false,
+                show: null,
+                date: date,
+                newDate: null,
+                currentMonthDate: null,
+                typeFlow: new DatetimeTypeFlow(this, date ? date.clone() : moment().locale(this.momentLocale)),
+                datePickerItemHeight: null
+            }
+        },
+        watch: {
+            value(newValue) {
+                this.date = this.getDate()
+                this.typeFlow.setDate(this.date ? this.date.clone() : moment().locale(this.momentLocale))
+                this.newDate = this.getNewDate()
+                this.currentMonthDate = this.getCurrentMonthDate()
+            }
+        },
+        created() {
+            if (this.date) {
+                this.$emit('input', this.typeFlow.isoDate())
+            }
+        },
+        computed: {
+            inputValue() {
+                return this.typeFlow.format(this.date, this.inputFormat || this.typeFlow.inputFormat())
+            },
+            newDay() {
+                return this.newDate.format('ddd, MMM D')
+            },
+            newYear() {
+                return this.newDate.format('YYYY')
+            },
+            currentMonth() {
+                return this.currentMonthDate.format('MMMM YYYY')
+            },
+            weekdays() {
+                return weekdays(this.momentLocale, this.mondayFirst)
+            },
+            currentMonthDays() {
+                const currentYear = this.currentMonthDate.year()
+                const currentMonth = this.currentMonthDate.month()
+                console.log(currentMonth, currentYear, this.currentMonthDate);
+                const isCurrentMonth = currentYear === this.newDate.year() &&
+                    currentMonth === this.newDate.month()
+                console.log(isCurrentMonth)
+                let days = monthDays(currentMonth, currentYear, this.mondayFirst)
+                console.log(days)
+                console.log(days.map(day => {
+                    return {
+                        number: day || '',
+                        selected: day ? isCurrentMonth && day === this.newDate.date() : false,
+                        disabled: day ? this.isDisabled(moment([currentYear, currentMonth, day])) : true
+                    }
+                }))
+                return days.map(day => {
+                    return {
+                        number: day || '',
+                        selected: day ? isCurrentMonth && day === this.newDate.date() : false,
+                        disabled: day ? this.isDisabled(moment([currentYear, currentMonth, day])) : true
+                    }
+                })
+            },
+            years() {
+                return years().map(year => {
+                    return {
+                        number: year,
+                        selected: year === this.newDate.year()
+                    }
+                })
+            },
+            hours() {
+                return hours().map(hour => {
+                    return {
+                        number: hour,
+                        selected: parseInt(hour) === parseInt(this.newDate.hour())
+                    }
+                })
+            },
+            minutes() {
+                return minutes().map(minute => {
+                    return {
+                        number: minute,
+                        selected: parseInt(minute) === this.newDate.minute()
+                    }
+                })
+            },
+            disabledDatesRanges() {
+                return this.disabledDates.map(function (item) {
+                    return Array.isArray(item) ? [moment(item[0]), moment(item[1])] : [moment(item), moment(item).add(1, 'day')]
+                })
+            },
+            datePickerHeight() {
+                let height = (Math.ceil(this.currentMonthDays.length / 7) + 1) * this.datePickerItemHeight
+                return height ? height + 'px' : 'auto'
+            }
+        },
+        methods: {
+            getDate() {
+                return this.value.length ? moment(this.value, this.type === 'time' ? 'HH:mm' : null).locale(this.momentLocale) : null
+            },
+            getNewDate() {
+                let newDate = this.date ? this.date.clone() : moment().locale(this.momentLocale)
+                for (let i = 0; i < 1e5 && this.isDisabled(newDate); i++) {
+                    newDate = newDate.clone().add(1, 'day')
+                }
+                return newDate
+            },
+            getCurrentMonthDate() {
+                console.log(moment([this.newDate.year(), this.newDate.month(), 1]))
+                return moment([this.newDate.year(), this.newDate.month(), 1]).locale(this.momentLocale)
+            },
+            open() {
+                this.newDate = this.getNewDate()
+                this.currentMonthDate = this.getCurrentMonthDate()
+                this.isOpen = true
+                this.$refs.input.blur()
+                this.typeFlow.open()
+                this.$nextTick(() => {
+                    let height = (this.$refs.popupBody.clientHeight - 25) + 'px'
+                    this.$refs.hourPicker.style.height = height
+                    this.$refs.minutePicker.style.height = height
+                    this.$refs.yearPicker.style.height = height
+                })
+            },
+            close(save = true) {
+                this.typeFlow.close()
+                if (save === true) {
+                    this.date = this.typeFlow.date.clone()
+                    this.$emit('input', this.typeFlow.isoDate())
+                }
+                this.isOpen = false
+            },
+            ok() {
+                if (this.show === 'year') {
+                    this.showDatePicker()
+                } else {
+                    this.typeFlow.ok()
+                }
+            },
+            showDatePicker() {
+                this.show = 'date'
+                this.$nextTick(() => {
+                    this.datePickerItemHeight = this.$refs.popupBody.getElementsByClassName('vdatetime-popup__date-picker__item')[7].offsetHeight
+                })
+            },
+            showTimePicker() {
+                this.show = 'time'
+                this.$nextTick(() => {
+                    let selectedHour = this.$refs.hourPicker.querySelector('.vdatetime-popup__list-picker__item--selected')
+                    let selectedMinute = this.$refs.minutePicker.querySelector('.vdatetime-popup__list-picker__item--selected')
+                    this.$refs.hourPicker.scrollTop = selectedHour ? selectedHour.offsetTop - 250 : 0
+                    this.$refs.minutePicker.scrollTop = selectedMinute ? selectedMinute.offsetTop - 250 : 0
+                })
+            },
+            showYearPicker() {
+                this.show = 'year'
+                this.$nextTick(() => {
+                    let selectedYear = this.$refs.yearPicker.querySelector('.vdatetime-popup__list-picker__item--selected')
+                    this.$refs.yearPicker.scrollTop = selectedYear ? selectedYear.offsetTop - 250 : 0
+                })
+            },
+            previousMonth() {
+                this.currentMonthDate = this.currentMonthDate.clone().subtract(1, 'month')
+            },
+            nextMonth() {
+                this.currentMonthDate = this.currentMonthDate.clone().add(1, 'month')
+            },
+            selectYear(year) {
+                this.currentMonthDate = this.currentMonthDate.clone().year(year)
+                this.newDate = this.newDate.clone().year(year)
+                if (this.autoContinue) {
+                    this.showDatePicker()
+                }
+            },
+            selectDay(day) {
+                this.typeFlow.selectDay(this.currentMonthDate.year(), this.currentMonthDate.month(), day)
+                this.newDate = this.typeFlow.date.clone()
+            },
+            selectHour(hour) {
+                this.typeFlow.selectHour(hour)
+                this.newDate = this.typeFlow.date.clone()
+            },
+            selectMinute(minute) {
+                this.typeFlow.selectMinute(minute)
+                this.newDate = this.typeFlow.date.clone()
+            },
+            isDisabled(date) {
+                return (this.minDate && date.isBefore(this.minDate, 'day')) ||
+                    (this.maxDate && date.isAfter(this.maxDate, 'day')) ||
+                    (this.disabledDatesRanges && this.disabledDatesRanges.find(function (dates) {
+                        return date.isBetween(dates[0], dates[1], 'day', '[)')
+                    }) !== undefined)
+            }
+        },
+        template: `
+    <div class="vdatetime" :class="wrapperClass">
+        <input ref="input"
+               v-bind="$attrs"
+               v-on="$listeners"
+               type="text"
+               :placeholder="placeholder"
+               :value="inputValue"
+               :class="inputClass"
+               :required="required"
+               @click="open"
+               @focus="open"/>
+        <transition name="vdatetime-fade">
+            <div v-if="isOpen">
+                <div class="vdatetime-overlay" @click.self="close(false)"></div>
+                <div class="vdatetime-popup">
+                    <div class="vdatetime-popup__header">
+                        <div class="vdatetime-popup__year" @click="showYearPicker">{{ newYear }}</div>
+                        {{ newDay }}
+                    </div>
+                    <div class="vdatetime-popup__body" ref="popupBody">
+                        <div v-show="show === 'date'">
+                            <div class="vdatetime-popup__month-selector">
+                                <div class="vdatetime-popup__month-selector__previous" @click="previousMonth">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 61.3 102.8">
+                                        <path fill="none" stroke="#444" stroke-width="14" stroke-miterlimit="10" d="M56.3 97.8L9.9 51.4 56.3 5"/>
+                                    </svg>
+                                </div>
+                                <div class="vdatetime-popup__month-selector__current">{{ currentMonth }}</div>
+                                <div class="vdatetime-popup__month-selector__next" @click="nextMonth">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 61.3 102.8">
+                                        <path fill="none" stroke="#444" stroke-width="14" stroke-miterlimit="10" d="M56.3 97.8L9.9 51.4 56.3 5"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="vdatetime-popup__date-picker" :style="{height: datePickerHeight}">
+                                <div class="vdatetime-popup__date-picker__item vdatetime-popup__date-picker__item--header" v-for="weekday in weekdays">{{ weekday }}</div>
+                                <div class="vdatetime-popup__date-picker__item" v-for="day in currentMonthDays" @click="!day.disabled && selectDay(day.number)" :class="{'vdatetime-popup__date-picker__item--selected': day.selected, 'vdatetime-popup__date-picker__item--disabled': day.disabled}">
+                                    <span><span>{{ day.number }}</span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-show="show === 'time'" class="vdatetime-popup__list-picker-wrapper">
+                            <div class="vdatetime-popup__list-picker vdatetime-popup__list-picker--half" ref="hourPicker">
+                                <div class="vdatetime-popup__list-picker__item" v-for="hour in hours" @click="selectHour(hour.number)" :class="{'vdatetime-popup__list-picker__item--selected': hour.selected}">{{ hour.number }}</div>
+                            </div>
+                            <div class="vdatetime-popup__list-picker vdatetime-popup__list-picker--half" ref="minutePicker">
+                                <div class="vdatetime-popup__list-picker__item" v-for="minute in minutes" @click="selectMinute(minute.number)" :class="{'vdatetime-popup__list-picker__item--selected': minute.selected}">{{ minute.number }}</div>
+                            </div>
+                        </div>
+                        <div v-show="show === 'year'" class="vdatetime-popup__list-picker-wrapper">
+                            <div class="vdatetime-popup__list-picker" ref="yearPicker">
+                                <div class="vdatetime-popup__list-picker__item" v-for="year in years" @click="selectYear(year.number)" :class="{'vdatetime-popup__list-picker__item--selected': year.selected}">{{ year.number }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="vdatetime-popup__actions">
+                        <div class="vdatetime-popup__actions__button" @click="close(false)">{{ i18n.cancel }}</div>
+                        <div class="vdatetime-popup__actions__button" @click="ok">{{ i18n.ok }}</div>
+                    </div>
+                </div>
+            </div>
+        </transition>
+    </div>
+    `
+    }
+);
+
 Vue.component('id-canvas', {
         data: function () {
             return {lorem: "canvas", canvas: this.$refs.canvas}
         },
         template: `
-            <div class="mdc-card">
-                <header class="mdc-toolbar">
-                    <div class="mdc-toolbar-row">
-                        <section class="mdc-toolbar__section">
-                            <span class="mdc-toolbar__title">Teken hier</span>
-                        </section>
+            <div class="card">
+                <nav>
+                    <div class="nav-wrapper purple">
+                        <div class="row">
+                            <div class="col s12">
+                                <label class="brand-logo">Teken hier!</label>
+                            </div>
+                        </div>
                     </div>
-                </header>
+                </nav>
             </div>
         `
     }
@@ -55,58 +440,56 @@ Vue.component('id-ideas', {
             }
         },
         template: `
-            <div class="mdc-card">
-               <header class="mdc-toolbar">
-                   <div class="mdc-toolbar__row">
-                       <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
-                           <span class="mdc-toolbar__title">Title</span>
-                       </section>
-                       <section class="mdc-toolbar__section mdc-toolbar__section--align-end">
-                           <span class="mdc-toolbar__title"><button class="mdc-button mdc-button--unelevated secondary-filled-button">
-                               Deel jouw idee!
-                           </button></span>
-                       </section>
-                   </div>
-               </header>
-               <ul class="mdc-list">
-                    <a v-for="(item, i) in items" v-if="i < 7" href="" :key="i" class="mdc-ripple-surface mdc-list-item">
-                        <span class="mdc-list-item__text">
-                            {{item.title}}
-                            <span class="mdc-list-item__text__secondary">{{item.message}}</span>
-                        </span>
-                    </a>
-                </ul>
-                <aside class="mdc-dialog" role="alertdialog" aria-labelledby="dialog-title" aria-describedby="dialog-description">
-                    <div class="mdc-dialog__surface">
-                        <header class="mdc-dialog__header">
-                            <h2 class="mdc-dialog__header__title">Deel jouw idee!</h2>
-                        </header>
+            <div class="card">
+                <nav>
+                    <div class="nav-wrapper purple">
+                        <div class="row">
+                            <div class="col s12">
+                                <label class="brand-logo">Deel jouw idee!</label>
+                                <ul class="right">
+                                    <a class="waves-effect waves-light btn modal-trigger teal" href="#modal1">Klik hier</a>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <form>
-                        <div class="mdc-text-field">
-                            <input type="text" class="mdc-text-field__input">
-                            <label class="mdc-text-field__label">Stamnummer/gebruikersnaam</label> 
-                        </div>
-                        <div class="mdc-select" role="listbox" tabindex="0">
-                            <span class="mdc-select__selected-text">Sector</span>
-                            <div class="mdc-simple-menu mdc-select__menu">
-                                <ul class="mdc-list mdc-simple-menu__items">
-                                    <li v-for="sector in sectorList">{{sector}}</li>   
-                                </ul>                                     
-                            </div> 
-                        </div>
-                        <div class="mdc-text-field">
-                            <input type="text" class="mdc-text-field__input">
-                            <label class="mdc-text-field__label">Titel</label>
-                        </div>
-                        <div class="mdc-text-field">
-                            <input type="text" class="mdc-text-field__input">
-                            <label class="mdc-text-field__label">Bericht</label>
-                        </div>
-                        <button class="mdc-button">Submit</button> 
-                    </form>   
-                </aside>
+                </nav>
+                <ul class="collapsible" data-collapsible="accordion">
+                    <li v-for="(item, i) in items" v-if="i < 7" href="" :key="i">
+                        <div class="collapsible-header">{{item.title}}</div>
+                        <div class="collapsible-body"><span>{{item.message}}</span></div>
+                    </li>
+                </ul>
+                
+                <div id="modal1" class="modal">
+                    <div class="modal-content">
+                        <form>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                    <input id="user" type="text" class="validate" required>
+                                    <label for="user" data-error="Vul stamnummer of gebruikersnaam in">Stamnummer/Gebruikersnaam</label>
+                                </div>
+                                <div class="input-field col s6">
+                                    <select>
+                                        <option value="" disabled selected>Kies je sector</option>
+                                        <option v-for="sector in sectorList" :value="sector">{{sector}}</option>
+                                    </select>
+                                    <label>Sector</label>
+                                </div>
+                                <div class="input-field col s12">
+                                    <input id="title" type="text" class="validate">
+                                    <label for="title" data-error="Vul een titel in">Titel</label>
+                                </div>
+                                <div class="input-field col s12">
+                                    <textarea id="message" class="materialize-textarea"></textarea>
+                                    <label for="message">Typ hier je bericht.</label>
+                                </div>
+                            </div>  
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                      <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Submit</a>
+                    </div>
+                </div>
             </div>
             `,
         created() {
@@ -124,7 +507,7 @@ Vue.component('id-appointment', {
                 lorem: "form",
                 dialog: false,
                 validForm: false,
-                formInput: {student_number: "", date: "", time: "", message: ""}
+                formInput: {student_number: "", date: "2018-01-11 18:00", time: "", message: ""}
             }
         },
         methods: {
@@ -135,50 +518,38 @@ Vue.component('id-appointment', {
             }
         },
         template: `
-        <v-card class="ma-2 mb-0">
-            <v-toolbar dark color="teal">
-                <v-toolbar-title>Zebra geloten?</v-toolbar-title>
-                <v-spacer></v-spacer>
-                <v-btn color="purple" large dark @click.native="dialog = true">Maak een afspraak</v-btn>
-            </v-toolbar>
-            <v-container>
-                
-            </v-container>
-            <v-dialog v-model="dialog" fullscreen transition="dialog-bottom-transition" :overlay="false">
-                <v-card>
-                    <v-toolbar dark color="teal">
-                        <v-btn icon @click.native="dialog = false" dark>
-                            <v-icon>close</v-icon>
-                        </v-btn>
-                        <v-toolbar-title>Maak een afspraak</v-toolbar-title>
-                        <v-spacer></v-spacer>                               
-                    </v-toolbar>
-                    <v-card-text>
-                        <v-form v-model="validForm" lazy-validation>
-                            <v-container grid-list-md>
-                                    <v-layout row wrap>
-                                        <v-flex d-flex>
-                                            <v-flex xs8 offset-xs2>
-                                                <v-text-field v-model="formInput.student_number" label="Stamnummer/gebruikersnaam" required :rules="[v=>!!v || 'this field is required']"></v-text-field>
-                                                <v-text-field v-model="formInput.message" name="input-7-1" label="Bericht" multi-line required :rules="[v=>!!v || 'this field is required']"></v-text-field>
-                                                
-                                                <v-flex xs12 d-flex>
-                                                    <v-date-picker v-model="formInput.date" color="teal" ></v-date-picker>
-                                                    <v-spacer></v-spacer>
-                                                    <v-time-picker v-model="formInput.time" color="teal" ></v-time-picker>
-                                                </v-flex>
-                                                <v-flex xs2 offset-xs10>
-                                                    <v-btn class="mt-3" @click="submit" block :disabled="!validForm">Submit</v-btn>
-                                                </v-flex>
-                                            </v-flex>   
-                                        </v-flex>
-                                    </v-layout>
-                            </v-container>
-                        </v-form>
-                    </v-card-text>
-                </v-card>
-            </v-dialog>
-        </v-card>`
+        <div class="card">
+            <nav>
+                <div class="nav-wrapper purple">
+                    <div class="row">
+                        <div class="col s12">
+                            <label class="brand-logo">Zebra gesloten? Maak een afspraak!</label>
+                            <ul class="right">
+                                <a class="waves-effect waves-light btn modal-trigger teal" href="#modal2">Klik hier</a>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            
+            
+            <div id="modal2" class="modal">
+                    <div class="modal-content">
+                        <form>
+                            <div class="row">
+
+                                <datepicker v-model="formInput.date"
+          input-format="DD-MM-YYYY HH:mm"></datepicker>
+
+                            </div>  
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                      <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Submit</a>
+                    </div>
+                </div>
+            </div>
+            `
     }
 );
 
