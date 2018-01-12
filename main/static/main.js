@@ -435,7 +435,8 @@ Vue.component('id-ideas', {
         methods: {
             submit() {
                 this.$http.post('api/ideas/', this.formInput).then((response) => {
-                    this.dialog = false;
+                    console.log("idea submit")
+                    $('.modal').close()
                 });
             }
         },
@@ -462,32 +463,34 @@ Vue.component('id-ideas', {
                 
                 <div id="modal1" class="modal">
                     <div class="modal-content">
-                        <form>
+                        <form id="idea">
+                            <h4>Deel jouw idee</h4>
                             <div class="row">
                                 <div class="input-field col s6">
                                     <input id="user" type="text" class="validate" required>
-                                    <label for="user" data-error="Vul stamnummer of gebruikersnaam in">Stamnummer/Gebruikersnaam</label>
+                                    <label for="user" data-error="Vul jouw stamnummer of gebruikersnaam in">Stamnummer/Gebruikersnaam</label>
                                 </div>
                                 <div class="input-field col s6">
-                                    <select>
+                                    <select required>
                                         <option value="" disabled selected>Kies je sector</option>
-                                        <option v-for="sector in sectorList" :value="sector">{{sector}}</option>
+                                        <option v-for="sector in sectorList" :value="sector" data-error="Vul jouw sector in">{{sector}}</option>
                                     </select>
                                     <label>Sector</label>
                                 </div>
                                 <div class="input-field col s12">
-                                    <input id="title" type="text" class="validate">
+                                    <input id="title" type="text" class="validate" required>
                                     <label for="title" data-error="Vul een titel in">Titel</label>
                                 </div>
                                 <div class="input-field col s12">
-                                    <textarea id="message" class="materialize-textarea"></textarea>
-                                    <label for="message">Typ hier je bericht.</label>
+                                    <textarea id="message" class="materialize-textarea" required></textarea>
+                                    <label for="message" data-error="Vul een bericht in">Typ hier je bericht</label>
                                 </div>
                             </div>  
                         </form>
                     </div>
                     <div class="modal-footer">
-                      <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Submit</a>
+                      <button type="reset" form="idea" class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</button>
+                      <button @click="submit" class="modal-action waves-effect waves-green btn-flat">Submit</button>
                     </div>
                 </div>
             </div>
@@ -507,13 +510,14 @@ Vue.component('id-appointment', {
                 lorem: "form",
                 dialog: false,
                 validForm: false,
-                formInput: {student_number: "", date: "2018-01-11 18:00", time: "", message: ""}
+                formInput: {student_number: "", date: "", time: "", message: ""}
             }
         },
         methods: {
             submit() {
                 this.$http.post('api/appointments/', this.formInput).then((response) => {
-                    this.dialog = false;
+                    console.log("afspraak submit")
+                    $('.modal').close()
                 });
             }
         },
@@ -533,19 +537,31 @@ Vue.component('id-appointment', {
             </nav>
             
             
+            
+            
             <div id="modal2" class="modal">
                     <div class="modal-content">
-                        <form>
+                    <h4>Maak een afspraak</h4>
+                        <form id="afspraak">
                             <div class="row">
-
-                                <datepicker v-model="formInput.date"
-          input-format="DD-MM-YYYY HH:mm"></datepicker>
-
+                                <div class="input-field col s6">
+                                    <input id="user" type="text" class="validate" required>
+                                    <label for="user" data-error="Vul stamnummer of gebruikersnaam in">Stamnummer/Gebruikersnaam</label>
+                                </div>
+                                <div class="input-field col s6">
+                                    <datepicker id="date" v-model="formInput.date" placeholder="Kies een datum en tijd" input-format="DD-MM-YYYY HH:mm"></datepicker>
+                                    <label for="date">Kies een datum en tijd</label>
+                                </div>
+                                <div class="input-field col s12">
+                                    <textarea id="message" class="materialize-textarea"></textarea>
+                                    <label for="message">Typ hier je bericht.</label>
+                                </div>
                             </div>  
                         </form>
                     </div>
                     <div class="modal-footer">
-                      <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Submit</a>
+                      <button type="reset" form="afspraak" class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</button>
+                      <button @click="submit" class="modal-action waves-effect waves-green btn-flat">Submit</button>
                     </div>
                 </div>
             </div>
