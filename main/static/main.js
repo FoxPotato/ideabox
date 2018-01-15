@@ -1,57 +1,63 @@
+function pad(number) {
+    if (number < 10) {
+        return '0' + number;
+    }
+    return number;
+}
 
-    function weekdays(momentLocale, mondayFirst = false) {
-        const weekdays = moment.localeData(momentLocale).weekdaysMin()
-        if (mondayFirst) {
-            return weekdays.slice(1).concat(weekdays[0])
-        }
-        return weekdays
+function weekdays(momentLocale, mondayFirst = false) {
+    const weekdays = moment.localeData(momentLocale).weekdaysMin()
+    if (mondayFirst) {
+        return weekdays.slice(1).concat(weekdays[0])
+    }
+    return weekdays
+}
+
+function monthDays(month, year, mondayFirst = false) {
+    const monthDate = moment([year, month, 1])
+    let firstDay = monthDate.day() - (mondayFirst ? 1 : 0)
+
+    if (firstDay === -1) {
+        firstDay = 6
     }
 
-    function monthDays(month, year, mondayFirst = false) {
-        const monthDate = moment([year, month, 1])
-        let firstDay = monthDate.day() - (mondayFirst ? 1 : 0)
+    let days = (new Array(monthDate.daysInMonth() + firstDay)).fill(null)
 
-        if (firstDay === -1) {
-            firstDay = 6
-        }
+    return days.map((value, index) => {
+        return index + 1 < firstDay ? null : index + 1 - firstDay
+    })
+}
 
-        let days = (new Array(monthDate.daysInMonth() + firstDay)).fill(null)
+function years() {
+    const currentYear = moment().year()
+    let years = []
 
-        return days.map((value, index) => {
-            return index + 1 < firstDay ? null : index + 1 - firstDay
-        })
+    for (let i = currentYear - 100; i < currentYear + 100; i++) {
+        years.push(i)
     }
 
-    function years() {
-        const currentYear = moment().year()
-        let years = []
+    return years
+}
 
-        for (let i = currentYear - 100; i < currentYear + 100; i++) {
-            years.push(i)
-        }
+function hours() {
+    let hours = []
 
-        return years
+    for (let i = 0; i < 24; i++) {
+        hours.push(i < 10 ? '0' + i : i)
     }
 
-    function hours() {
-        let hours = []
+    return hours
+}
 
-        for (let i = 0; i < 24; i++) {
-            hours.push(i < 10 ? '0' + i : i)
-        }
+function minutes() {
+    let minutes = []
 
-        return hours
+    for (let i = 0; i < 60; i++) {
+        minutes.push(i < 10 ? '0' + i : i)
     }
 
-    function minutes() {
-        let minutes = []
-
-        for (let i = 0; i < 60; i++) {
-            minutes.push(i < 10 ? '0' + i : i)
-        }
-
-        return minutes
-    }
+    return minutes
+}
 
 Vue.component('datepicker', {
         props: {
@@ -434,9 +440,12 @@ Vue.component('id-ideas', {
         },
         methods: {
             submit() {
+                console.log(this.formInput)
                 this.$http.post('api/ideas/', this.formInput).then((response) => {
-                    console.log("idea submit")
-                    $('.modal').close()
+                    $('.modal').modal("close");
+                    this.$http.get('/api/ideas/').then((response) => {
+                        this.items = response.body;
+                    })
                 });
             }
         },
@@ -455,7 +464,7 @@ Vue.component('id-ideas', {
                     </div>
                 </nav>
                 <ul class="collapsible" data-collapsible="accordion">
-                    <li v-for="(item, i) in items" v-if="i < 7" href="" :key="i">
+                    <li v-for="(item, i) in items" v-if="i < 12" href="" :key="i">
                         <div class="collapsible-header">{{item.title}}</div>
                         <div class="collapsible-body"><span>{{item.message}}</span></div>
                     </li>
@@ -467,30 +476,30 @@ Vue.component('id-ideas', {
                             <h4>Deel jouw idee</h4>
                             <div class="row">
                                 <div class="input-field col s6">
-                                    <input id="user" type="text" class="validate" required>
+                                    <input id="user" type="text" class="validate" v-model="formInput.student_number" required>
                                     <label for="user" data-error="Vul jouw stamnummer of gebruikersnaam in">Stamnummer/Gebruikersnaam</label>
                                 </div>
-                                <div class="input-field col s6">
-                                    <select required>
-                                        <option value="" disabled selected>Kies je sector</option>
-                                        <option v-for="sector in sectorList" :value="sector" data-error="Vul jouw sector in">{{sector}}</option>
-                                    </select>
+                                <div class="col s6">
                                     <label>Sector</label>
+                                    <select v-model="formInput.sector" class="browser-default validate" data-error="Vul jouw sector in" required>
+                                        <option value="" disabled>Kies je sector</option>
+                                        <option v-for="sector in sectorList" :value="sector">{{sector}}</option>
+                                    </select>
                                 </div>
                                 <div class="input-field col s12">
-                                    <input id="title" type="text" class="validate" required>
+                                    <input id="title" type="text" class="validate" v-model="formInput.title" required>
                                     <label for="title" data-error="Vul een titel in">Titel</label>
                                 </div>
                                 <div class="input-field col s12">
-                                    <textarea id="message" class="materialize-textarea" required></textarea>
+                                    <textarea id="message" class="materialize-textarea validate" v-model="formInput.message" required></textarea>
                                     <label for="message" data-error="Vul een bericht in">Typ hier je bericht</label>
                                 </div>
                             </div>  
                         </form>
                     </div>
                     <div class="modal-footer">
-                      <button type="reset" form="idea" class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</button>
-                      <button @click="submit" class="modal-action waves-effect waves-green btn-flat">Submit</button>
+                        <button type="reset" form="idea" class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</button>
+                        <button @click="submit" class="modal-action waves-effect waves-green btn-flat">Submit</button>
                     </div>
                 </div>
             </div>
@@ -515,10 +524,23 @@ Vue.component('id-appointment', {
         },
         methods: {
             submit() {
+                datetime = new Date($('#date').val());
+
+                time = $('#time').val().split(':');
+                datetime.setHours(time[0]);
+                datetime.setMinutes(time[1]);
+
+                this.formInput.date = datetime.getFullYear() +
+                    '-' + pad(datetime.getMonth() + 1) +
+                    '-' + pad(datetime.getDate());
+
+                this.formInput.time = pad(datetime.getHours()) +
+                    ':' + pad(datetime.getMinutes());
+
                 this.$http.post('api/appointments/', this.formInput).then((response) => {
-                    console.log("afspraak submit")
-                    $('.modal').close()
+                    $('.modal').modal("close");
                 });
+
             }
         },
         template: `
@@ -536,32 +558,33 @@ Vue.component('id-appointment', {
                 </div>
             </nav>
             
-            
-            
-            
             <div id="modal2" class="modal">
                     <div class="modal-content">
                     <h4>Maak een afspraak</h4>
-                        <form id="afspraak">
+                        <form id="appointment">
                             <div class="row">
                                 <div class="input-field col s6">
-                                    <input id="user" type="text" class="validate" required>
+                                    <input id="user" type="text" class="validate" v-model="formInput.student_number" required>
                                     <label for="user" data-error="Vul stamnummer of gebruikersnaam in">Stamnummer/Gebruikersnaam</label>
                                 </div>
-                                <div class="input-field col s6">
-                                    <datepicker id="date" v-model="formInput.date" placeholder="Kies een datum en tijd" input-format="DD-MM-YYYY HH:mm"></datepicker>
-                                    <label for="date">Kies een datum en tijd</label>
+                                <div class="input-field col s4">
+                                    <input id="date" type="text" class="datepicker" required>
+                                    <label for="date" data-error="Vul een datum in">Kies een datum</label>
+                                </div>
+                                <div class="input-field col s2">
+                                    <input id="time" type="text" class="timepicker" required>    
+                                    <label for="time" data-error="Vul een tijd in">Kies een tijd</label>
                                 </div>
                                 <div class="input-field col s12">
-                                    <textarea id="message" class="materialize-textarea"></textarea>
+                                    <textarea id="message" class="materialize-textarea validate" v-model="formInput.message" required></textarea>
                                     <label for="message">Typ hier je bericht.</label>
                                 </div>
                             </div>  
                         </form>
                     </div>
                     <div class="modal-footer">
-                      <button type="reset" form="afspraak" class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</button>
-                      <button @click="submit" class="modal-action waves-effect waves-green btn-flat">Submit</button>
+                        <button type="reset" form="appointment" class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</button>
+                        <button @click="submit" class="modal-action waves-effect waves-green btn-flat">Submit</button>
                     </div>
                 </div>
             </div>

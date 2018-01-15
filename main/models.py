@@ -36,4 +36,5 @@ class IdeaModel(models.Model):
 class AppointmentModel(models.Model):
     student_number = models.CharField(max_length=256)
     message = models.TextField()
-    datetime = models.DateTimeField()
+    date = models.DateField()
+    time = models.TimeField()

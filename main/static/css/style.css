@@ -58,11 +58,12 @@ html, body {
 
 .card {
     margin: 0;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .modal {
-    overflow-y: initial;
+    overflow-y: visible;
+    transform: unset !important;
 }
 
 label .brand-logo {
